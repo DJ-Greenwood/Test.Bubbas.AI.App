@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Bubbas.ai - Your AI Companion{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Welcome to Bubbas.ai</h1>
+    <p>Your intelligent AI companion that remembers your conversations</p>
+    
+    {% if user.is_authenticated %}
+        <a href="{% url 'chatbot:chat' %}" class="btn btn-primary">Start Chatting</a>
+    {% else %}
+        <div class="cta-buttons">
+            <a href="{% url 'accounts:login' %}" class="btn btn-secondary">Login</a>
+            <a href="{% url 'accounts:register' %}" class="btn btn-primary">Sign Up</a>
+        </div>
+    {% endif %}
+</section>
+
+<section class="features">
+    <h2>Features</h2>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <h3>Smart Conversations</h3>
+            <p>Chat with an intelligent AI that understands context and provides meaningful responses.</p>
+        </div>
+        
+        <div class="feature-card">
+            <h3>Memory Retention</h3>
+            <p>Bubbas.ai remembers your past conversations for a more personalized experience.</p>
+        </div>
+        
+        <div class="feature-card">
+            <h3>Secure & Private</h3>
+            <p>Your conversations are securely stored and remain private to you.</p>
+        </div>
+    </div>
+</section>
+
+<section class="how-it-works">
+    <h2>How It Works</h2>
+    <ol class="steps">
+        <li>
+            <h3>Create an Account</h3>
+            <p>Sign up for free to start using Bubbas.ai</p>
+        </li>
+        <li>
+            <h3>Start a Conversation</h3>
+            <p>Chat with Bubbas about anything you want</p>
+        </li>
+        <li>
+            <h3>Review Past Chats</h3>
+            <p>Access your conversation history anytime</p>
+        </li>
+    </ol>
+</section>
+{% endblock %}

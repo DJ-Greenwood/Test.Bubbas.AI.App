@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Profile - Bubbas.ai{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <h2>Your Profile</h2>
+    
+    <div class="profile-info">
+        <div class="info-group">
+            <label>Username</label>
+            <p>{{ user.username }}</p>
+        </div>
+        
+        <div class="info-group">
+            <label>Email</label>
+            <p>{{ user.email }}</p>
+        </div>
+        
+        <div class="info-group">
+            <label>Member Since</label>
+            <p>{{ user.profile.created_at|date:"F j, Y" }}</p>
+        </div>
+        
+        <div class="info-group">
+            <label>Last Activity</label>
+            <p>{{ user.profile.last_activity|date:"F j, Y H:i" }}</p>
+        </div>
+    </div>
+    
+    <div class="profile-actions">
+        <a href="{% url 'chatbot:chat' %}" class="btn btn-primary">Go to Chat</a>
+    </div>
+</div>
+{% endblock %}
