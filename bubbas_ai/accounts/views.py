@@ -3,6 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import UserRegistrationForm, UserLoginForm
+from ErrorLog.services.error_logger import ErrorLogger
 
 def register_view(request):
     """View for user registration"""
@@ -17,6 +18,7 @@ def register_view(request):
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, error)
+                    ErrorLogger.log_error(f"Registration error in field {field}: {error}")
     else:
         form = UserRegistrationForm()
     
@@ -36,8 +38,10 @@ def login_view(request):
                 return redirect('chatbot:chat')
             else:
                 messages.error(request, "Invalid username or password.")
+                ErrorLogger.log_error("Invalid username or password during login.")
         else:
             messages.error(request, "Invalid username or password.")
+            ErrorLogger.log_error("Invalid login form submission.")
     else:
         form = UserLoginForm()
     
