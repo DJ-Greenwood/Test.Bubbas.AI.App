@@ -1,8 +1,7 @@
-# Create a new file: chatbot/services/error_logger.py
 import traceback
 import logging
 from django.conf import settings
-
+from ErrorLog.models import ErrorLog  # Import the model
 
 logger = logging.getLogger(__name__)
 
@@ -21,12 +20,14 @@ class ErrorLogger:
             extra_data: Any additional data to log (optional)
         """
         try:
+            print(f"ErrorLogger.log_error called with: {error_type}, {error_message}")
+            
             # Get stack trace if not provided
             if stack_trace is None:
                 stack_trace = traceback.format_exc()
             
             # Create error log entry
-            error_log = ErrorLogger(
+            error_log = ErrorLog(
                 error_type=error_type,
                 error_message=str(error_message),
                 stack_trace=stack_trace if stack_trace != 'None\n' else None,
@@ -45,7 +46,9 @@ class ErrorLogger:
                 error_log.ip_address = ErrorLogger._get_client_ip(request)
                 error_log.user_agent = request.META.get('HTTP_USER_AGENT', '')
             
+            # Save the error log to the database
             error_log.save()
+            print(f"Error log saved with ID: {error_log.id}")
             
             # Also log to Django's logging system
             logger.error(
@@ -60,6 +63,7 @@ class ErrorLogger:
             
         except Exception as e:
             # If error logging fails, fall back to standard logging
+            print(f"Error while logging error: {str(e)}")
             logger.error(f"Error logging failed: {str(e)}")
             logger.error(f"Original error: {error_type} - {error_message}")
             return None

@@ -1,9 +1,9 @@
 # Add this to your chatbot/admin.py file
 
 from django.contrib import admin
-from .models import ErrorLogger
+from .models import ErrorLog
 
-@admin.register(ErrorLogger)
+@admin.register(ErrorLog)
 class ErrorLogAdmin(admin.ModelAdmin):
     list_display = ('id', 'error_type', 'user', 'short_message', 'url', 'created_at', 'resolved')
     list_filter = ('error_type', 'resolved', 'created_at')

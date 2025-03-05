@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings - Bubbas.ai{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <h2>Settings</h2>
+    
+    <div class="settings-tabs">
+        <div class="tab-navigation">
+            <button class="tab-button active" data-tab="calendars">Calendars</button>
+            <button class="tab-button" data-tab="preferences">Preferences</button>
+        </div>
+        
+        <!-- Calendars Tab -->
+        <div class="tab-content active" id="calendars-tab">
+            <div class="section-header">
+                <h3>Your Calendars</h3>
+                <button class="btn btn-sm btn-primary" id="add-calendar-btn">
+                    <i class="fas fa-plus"></i> Add Calendar
+                </button>
+            </div>
+            
+            <div class="calendar-list">
+                {% if calendars %}
+                    {% for calendar in calendars %}
+                        <div class="calendar-item">
+                            <div class="calendar-info">
+                                <h4>{{ calendar.calendar_name }}</h4>
+                                <p>{{ calendar.get_calendar_type_display }}</p>
+                                {% if calendar.is_primary %}
+                                    <span class="badge primary">Primary</span>
+                                {% endif %}
+                            </div>
+                            <div class="calendar-actions">
+                                <a href="{% url 'settings:edit_calendar' calendar.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                                <form method="post" action="{% url 'settings:delete_calendar' calendar.id %}" class="inline-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to remove this calendar?')">Remove</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>You haven't added any calendars yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Add Calendar Form (hidden by default) -->
+            <div id="add-calendar-form" class="form-panel" style="display: none;">
+                <h4>Add New Calendar</h4>
+                <form method="post" action="{% url 'settings:add_calendar' %}">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="{{ calendar_form.calendar_type.id_for_label }}">Calendar Type</label>
+                        {{ calendar_form.calendar_type }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ calendar_form.calendar_name.id_for_label }}">Calendar Name</label>
+                        {{ calendar_form.calendar_name }}
+                    </div>
+                    
+                    <div class="form-check">
+                        {{ calendar_form.is_primary }}
+                        <label for="{{ calendar_form.is_primary.id_for_label }}">Set as primary calendar</label>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Add Calendar</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-add-calendar">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Preferences Tab -->
+        <div class="tab-content" id="preferences-tab">
+            <h3>Your Preferences</h3>
+            
+            <form method="post" action="{% url 'settings:update_preferences' %}">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="{{ preference_form.default_calendar.id_for_label }}">Default Calendar</label>
+                    {{ preference_form.default_calendar }}
+                    <small class="form-text text-muted">This calendar will be used for creating events by default.</small>
+                </div>
+                
+                <div class="form-check">
+                    {{ preference_form.enable_calendar_suggestions }}
+                    <label for="{{ preference_form.enable_calendar_suggestions.id_for_label }}">Enable calendar suggestions</label>
+                    <small class="form-text text-muted">Allow Bubbas to suggest events based on your conversations.</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ preference_form.reminder_time_minutes.id_for_label }}">Default Reminder Time (minutes)</label>
+                    {{ preference_form.reminder_time_minutes }}
+                    <small class="form-text text-muted">How many minutes before an event should you be reminded?</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ preference_form.timezone.id_for_label }}">Timezone</label>
+                    {{ preference_form.timezone }}
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Preferences</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Deactivate all tabs
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Activate selected tab
+                this.classList.add('active');
+                document.getElementById(tabId + '-tab').classList.add('active');
+            });
+        });
+        
+        // Add Calendar form toggle
+        const addCalendarBtn = document.getElementById('add-calendar-btn');
+        const addCalendarForm = document.getElementById('add-calendar-form');
+        const cancelAddCalendar = document.getElementById('cancel-add-calendar');
+        
+        addCalendarBtn.addEventListener('click', function() {
+            addCalendarForm.style.display = 'block';
+            this.style.display = 'none';
+        });
+        
+        cancelAddCalendar.addEventListener('click', function() {
+            addCalendarForm.style.display = 'none';
+            addCalendarBtn.style.display = 'inline-block';
+        });
+    });
+</script>
+{% endblock %}

@@ -23,5 +23,5 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
     path('accounts/', include('accounts.urls')),
     path('chat/', include('chatbot.urls')),
-   
+    path('settings/', include('settings.urls')),  # Add this line
 ]

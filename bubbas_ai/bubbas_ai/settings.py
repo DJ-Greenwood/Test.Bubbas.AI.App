@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     # Custom apps
     'accounts',
     'chatbot',
+    'ErrorLog',
+    'settings',
 ]
 
 MIDDLEWARE = [

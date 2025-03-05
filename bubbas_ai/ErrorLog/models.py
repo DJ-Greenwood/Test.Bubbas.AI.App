@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 
+
 logger = logging.getLogger(__name__)
 
 class ErrorLog(models.Model):
@@ -16,11 +17,16 @@ class ErrorLog(models.Model):
     method = models.CharField(max_length=10, null=True, blank=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.CharField(max_length=255, null=True, blank=True)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    resolved = models.BooleanField(default=False)
+    resolution_notes = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.error_type}: {self.error_message[:50]}"
-
+    
+    class Meta:
+        ordering = ['-created_at']
+        
 class ErrorLogger:
     @staticmethod
     def log_error(error_type, error_message, request=None, user=None, stack_trace=None, extra_data=None):

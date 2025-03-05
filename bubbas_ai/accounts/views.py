@@ -18,7 +18,7 @@ def register_view(request):
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, error)
-                    ErrorLogger.log_error(f"Registration error in field {field}: {error}")
+                    ErrorLogger.log_error("registration", f"Error in field {field}: {error}", request=request)
     else:
         form = UserRegistrationForm()
     
@@ -38,10 +38,10 @@ def login_view(request):
                 return redirect('chatbot:chat')
             else:
                 messages.error(request, "Invalid username or password.")
-                ErrorLogger.log_error("Invalid username or password during login.")
+                ErrorLogger.log_error("auth", "Invalid login form submission.", request=request)
         else:
             messages.error(request, "Invalid username or password.")
-            ErrorLogger.log_error("Invalid login form submission.")
+            ErrorLogger.log_error("auth", "Invalid login form submission.", request=request)
     else:
         form = UserLoginForm()
     

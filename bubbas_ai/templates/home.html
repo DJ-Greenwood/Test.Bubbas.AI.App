@@ -5,7 +5,7 @@
 {% block content %}
 <section class="hero">
     <h1>Welcome to Bubbas.ai</h1>
-    <p>Your intelligent AI companion that remembers your conversations</p>
+    <p>Your intelligent AI companion that remembers your conversations and helps manage your schedule</p>
     
     {% if user.is_authenticated %}
         <a href="{% url 'chatbot:chat' %}" class="btn btn-primary">Start Chatting</a>
@@ -31,8 +31,13 @@
         </div>
         
         <div class="feature-card">
+            <h3>Calendar Integration</h3>
+            <p>Connect your calendar and let Bubbas help you manage appointments and schedule your day.</p>
+        </div>
+        
+        <div class="feature-card">
             <h3>Secure & Private</h3>
-            <p>Your conversations are securely stored and remain private to you.</p>
+            <p>Your conversations and calendar data are securely stored and remain private to you.</p>
         </div>
     </div>
 </section>
@@ -45,8 +50,12 @@
             <p>Sign up for free to start using Bubbas.ai</p>
         </li>
         <li>
+            <h3>Connect Your Calendar</h3>
+            <p>Link your existing calendars for enhanced planning features</p>
+        </li>
+        <li>
             <h3>Start a Conversation</h3>
-            <p>Chat with Bubbas about anything you want</p>
+            <p>Chat with Bubbas about anything, including your schedule</p>
         </li>
         <li>
             <h3>Review Past Chats</h3>

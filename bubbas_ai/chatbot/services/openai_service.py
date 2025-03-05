@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class OpenAIService:
     def __init__(self):
-        self.client =OpenAI(api_key=settings.OPENAI_API_KEY)
+        self.client = OpenAI(api_key=settings.OPENAI_API_KEY)
         self.model = settings.OPENAI_MODEL
     
     def _format_messages(self, conversation_history, user=None):
@@ -17,7 +17,18 @@ class OpenAIService:
         
         # Add our enhanced system prompt
         user_name = user.username if user else None
-        system_prompt = get_system_prompt(user_name)
+        
+        # Check if user has any calendars connected
+        has_calendar = False
+        if user:
+            try:
+                # Import here to avoid circular imports
+                from settings.models import UserCalendar
+                has_calendar = UserCalendar.objects.filter(user=user, is_active=True).exists()
+            except:
+                pass
+        
+        system_prompt = get_system_prompt(user_name, has_calendar)
         formatted_messages.append({
             'role': 'system',
             'content': system_prompt
