@@ -31,6 +31,21 @@ class Conversation(models.Model):
                 # If there's an error (like when the relationship can't be used yet), just continue
                 pass
 
+    def get_messages(self):
+        """Get all messages in the conversation"""
+        return self.messages.all()
+    
+    def delete_messages(self, message_ids=None):
+        """Delete all messages or a selection of the conversation.
+        
+        Args:
+            message_ids (list, optional): List of message IDs to delete. If None, all messages will be deleted.
+        """
+        if message_ids:
+            self.messages.filter(id__in=message_ids).delete()
+        else:
+            self.messages.all().delete()
+
 class Message(models.Model):
     ROLE_CHOICES = (
         ('user', 'User'),

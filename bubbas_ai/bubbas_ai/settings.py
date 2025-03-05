@@ -11,7 +11,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 import os
+from dotenv import load_dotenv
 from pathlib import Path
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -115,7 +119,7 @@ LOGIN_REDIRECT_URL = 'chatbot:chat'
 LOGOUT_REDIRECT_URL = 'home'
 
 # OpenAI API Settings
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 OPENAI_MODEL = 'gpt-4o'  # Can be configured based on requirements
 
 # Session settings for storing chat history

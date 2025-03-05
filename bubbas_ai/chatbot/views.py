@@ -7,6 +7,8 @@ import json
 
 from .models import Conversation, Message
 from .services.openai_service import OpenAIService
+import logging
+logger = logging.getLogger(__name__)
 
 @login_required
 def chat_view(request):
@@ -37,55 +39,65 @@ def chat_view(request):
 @require_POST
 def send_message(request):
     """API endpoint to send a message and get AI response"""
-    data = json.loads(request.body)
-    user_message = data.get('message', '').strip()
-    conversation_id = data.get('conversation_id')
-    
-    if not user_message:
+    try:
+        data = json.loads(request.body)
+        user_message = data.get('message', '').strip()
+        conversation_id = data.get('conversation_id')
+        
+        if not user_message:
+            logger.error("Empty message received")
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Message cannot be empty'
+            }, status=400)
+        
+        # Get or create conversation
+        if conversation_id:
+            conversation = get_object_or_404(Conversation, id=conversation_id, user=request.user)
+        else:
+            conversation = Conversation.objects.create(user=request.user)
+        
+        # Save user message
+        Message.objects.create(
+            conversation=conversation,
+            role='user',
+            content=user_message
+        )
+        
+        # Update conversation timestamp
+        conversation.save()
+        
+        # Get conversation history
+        conversation_history = Message.objects.filter(conversation=conversation)
+        
+        # Generate AI response
+        openai_service = OpenAIService()
+        ai_response = openai_service.generate_response(conversation_history)
+        
+        # Save AI response
+        assistant_message = Message.objects.create(
+            conversation=conversation,
+            role='assistant',
+            content=ai_response
+        )
+        
+        logger.info(f"Message sent successfully: {assistant_message.content}")
+        
+        return JsonResponse({
+            'status': 'success',
+            'conversation_id': conversation.id,
+            'message': {
+                'id': assistant_message.id,
+                'content': assistant_message.content,
+                'created_at': assistant_message.created_at.isoformat(),
+            }
+        })
+    except Exception as e:
+        logger.exception("Error in send_message")
         return JsonResponse({
             'status': 'error',
-            'message': 'Message cannot be empty'
-        }, status=400)
-    
-    # Get or create conversation
-    if conversation_id:
-        conversation = get_object_or_404(Conversation, id=conversation_id, user=request.user)
-    else:
-        conversation = Conversation.objects.create(user=request.user)
-    
-    # Save user message
-    Message.objects.create(
-        conversation=conversation,
-        role='user',
-        content=user_message
-    )
-    
-    # Update conversation timestamp
-    conversation.save()
-    
-    # Get conversation history
-    conversation_history = Message.objects.filter(conversation=conversation)
-    
-    # Generate AI response
-    openai_service = OpenAIService()
-    ai_response = openai_service.generate_response(conversation_history)
-    
-    # Save AI response
-    assistant_message = Message.objects.create(
-        conversation=conversation,
-        role='assistant',
-        content=ai_response
-    )
-    
-    return JsonResponse({
-        'status': 'success',
-        'conversation_id': conversation.id,
-        'message': {
-            'id': assistant_message.id,
-            'content': assistant_message.content,
-            'created_at': assistant_message.created_at.isoformat(),
-        }
-    })
+            'message': 'An error occurred while processing your request'
+        }, status=500)
 
 @login_required
 def conversation_history(request, conversation_id):
